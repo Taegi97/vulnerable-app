@@ -12,6 +12,7 @@
 
 ![Architecture Diagram](https://github.com/Taegi97/vulnerable-app/blob/506f4a8637f63b3dde6cb2535a534641d68b997c/RLHVRnj547_VJp7a0P98lee_KAYggevTqW1ftPnf7n2Azkx6zkAxtMDtpy52aH1FIFG1X08lVYW2YJxq8MehfPNA5xAFxy3ihS_EoNc8l3VpcvdVp6ycjutbsXPPojwo8ymGCcvH2zvIXKs5HCQii2b2Y76XXPr2MySZOJ6sXKROImlCjP2MCHvRfQ6B4qnLZXguWGGdI_DM9.png?raw=true)
 
+
 ## 3\. 적용된 핵심 보안 기술 (Key Security Features)
 
   * **Infrastructure as Code (IaC) 보안 강화:** Terraform으로 작성된 초기 인프라 코드의 보안 취약점(Security Group, IAM Role 부재 등)을 분석하고, '최소 권한 원칙'에 따라 개선했습니다.
