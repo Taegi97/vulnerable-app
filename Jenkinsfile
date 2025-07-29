@@ -3,6 +3,7 @@ pipeline {
 
     tools {
         jdk 'jdk17'
+        maven 'M3'
     }
 
     stages {
@@ -16,21 +17,27 @@ pipeline {
                 withSonarQubeEnv('sonarqube') {
                     script {
                         def scannerHome = tool 'SonarQubeScanner'
-                        // SONAR_TOKEN 환경 변수가 자동으로 주입되므로 -Dsonar.login 부분은 제거합니다.
-                        sh "'${scannerHome}/bin/sonar-scanner' \
+                        // 셸 스크립트를 """ (Triple double quotes)로 감싸서 문법 오류 가능성을 최소화합니다.
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=vulnerable-app \
                             -Dsonar.sources=. \
-                            -Dsonar.host.url=http://localhost:9000"
+                            -Dsonar.host.url=http://localhost:9000
+                        """
                     }
                 }
             }
         }
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh 'docker build -t vulnerable-app:latest .'
-                }
+                sh 'docker build -t vulnerable-app:latest .'
             }
         }
         stage('Trivy Scan') {
             steps {
+                // Trivy가 HIGH, CRITICAL 취약점을 발견하면 빌드를 실패시킴
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL vulnerable-app:latest'
+            }
+        }
+    }
+}
