@@ -1,9 +1,13 @@
 pipeline {
     agent any
 
+    // 파이프라인에서 사용할 도구들을 정의합니다.
     tools {
-        jdk 'jdk17'
-        maven 'M3'
+        jdk 'jdk17' // Global Tool Configuration에 설정한 JDK 이름
+    }
+
+    environment {
+        SONARQUBE_URL = 'http://localhost:9000'
     }
 
     stages {
@@ -14,28 +18,29 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
+                // withSonarQubeEnv 블록을 사용하여 소나큐브 서버 설정을 불러옵니다.
                 withSonarQubeEnv('sonarqube') {
+                    // sh 단계를 'jdk17' 환경 안에서 실행하도록 합니다.
                     script {
                         def scannerHome = tool 'SonarQubeScanner'
-                        // 셸 스크립트를 """ (Triple double quotes)로 감싸서 문법 오류 가능성을 최소화합니다.
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
+                        sh "'${scannerHome}/bin/sonar-scanner' \
                             -Dsonar.projectKey=vulnerable-app \
                             -Dsonar.sources=. \
-                            -Dsonar.host.url=http://localhost:9000
-                        """
+                            -Dsonar.host.url=${SONARQUBE_URL} \
+                            -Dsonar.login=${credentials('sonarqube-token')}"
                     }
                 }
             }
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t vulnerable-app:latest .'
+                script {
+                    sh 'docker build -t vulnerable-app:latest .'
+                }
             }
         }
         stage('Trivy Scan') {
             steps {
-                // Trivy가 HIGH, CRITICAL 취약점을 발견하면 빌드를 실패시킴
                 sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL vulnerable-app:latest'
             }
         }
