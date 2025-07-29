@@ -1,13 +1,9 @@
 pipeline {
     agent any
 
-    // 파이프라인에서 사용할 도구들을 정의합니다.
     tools {
-        jdk 'jdk17' // Global Tool Configuration에 설정한 JDK 이름
-    }
-
-    environment {
-        SONARQUBE_URL = 'http://localhost:9000'
+        // 파이프라인이 사용할 도구 목록을 준비합니다.
+        jdk 'jdk17' 
     }
 
     stages {
@@ -18,25 +14,29 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                // withSonarQubeEnv 블록을 사용하여 소나큐브 서버 설정을 불러옵니다.
+                // withSonarQubeEnv: 소나큐브 서버 주소와 토큰을 환경 변수로 설정해줍니다.
                 withSonarQubeEnv('sonarqube') {
-                    // sh 단계를 'jdk17' 환경 안에서 실행하도록 합니다.
                     script {
+                        // def jdk: 'jdk17' 도구의 실제 설치 경로를 jdk 변수에 저장합니다.
+                        def jdk = tool 'jdk17'
+                        // def scannerHome: SonarQubeScanner 도구의 실제 설치 경로를 저장합니다.
                         def scannerHome = tool 'SonarQubeScanner'
-                        sh "'${scannerHome}/bin/sonar-scanner' \
-                            -Dsonar.projectKey=vulnerable-app \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=${SONARQUBE_URL} \
-                            -Dsonar.login=${credentials('sonarqube-token')}"
+
+                        // withEnv: sh 명령어를 실행할 때만 환경 변수를 일시적으로 변경합니다.
+                        // PATH를 우리가 지정한 jdk17의 bin 폴더가 가장 앞에 오도록 설정하여,
+                        // 무조건 jdk17의 java를 사용하도록 강제합니다.
+                        withEnv(["PATH+JDK=${jdk}/bin"]) {
+                            sh "'${scannerHome}/bin/sonar-scanner' \
+                                -Dsonar.projectKey=vulnerable-app \
+                                -Dsonar.sources=."
+                        }
                     }
                 }
             }
         }
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh 'docker build -t vulnerable-app:latest .'
-                }
+                sh 'docker build -t vulnerable-app:latest .'
             }
         }
         stage('Trivy Scan') {
