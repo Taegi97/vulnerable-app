@@ -1,14 +1,13 @@
 pipeline {
     agent any
 
+    // 파이프라인에서 사용할 도구들을 정의합니다.
     tools {
-        // Jenkins > Global Tool Configuration에 설정된 SonarQube Scanner 이름을 사용
-        maven 'M3'
-        jdk 'jdk17'
+        jdk 'jdk17' // Global Tool Configuration에 설정한 JDK 이름
     }
 
     environment {
-        SCANNER_HOME = tool 'SonarQubeScanner'
+        SONARQUBE_URL = 'http://localhost:9000'
     }
 
     stages {
@@ -19,12 +18,17 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
+                // withSonarQubeEnv 블록을 사용하여 소나큐브 서버 설정을 불러옵니다.
                 withSonarQubeEnv('sonarqube') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectKey=vulnerable-app \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://localhost:9000 \
-                        -Dsonar.login=squ_2a27b872365d56419798e98218d8e5792949704e '''
+                    // sh 단계를 'jdk17' 환경 안에서 실행하도록 합니다.
+                    script {
+                        def scannerHome = tool 'SonarQubeScanner'
+                        sh "'${scannerHome}/bin/sonar-scanner' \
+                            -Dsonar.projectKey=vulnerable-app \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=${SONARQUBE_URL} \
+                            -Dsonar.login=${credentials('sonarqube-token')}"
+                    }
                 }
             }
         }
@@ -37,7 +41,6 @@ pipeline {
         }
         stage('Trivy Scan') {
             steps {
-                // Trivy가 HIGH, CRITICAL 취약점을 발견하면 빌드를 실패시킴
                 sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL vulnerable-app:latest'
             }
         }
