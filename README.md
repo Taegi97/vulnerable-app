@@ -10,7 +10,7 @@
 
 프로젝트의 전체 아키텍처는 다음과 같습니다.
 
-![Architecture Diagram]([https://github.com/Taegi97/vulnerable-app/blob/main/architecture-diagram.png?raw=true](https://github.com/Taegi97/vulnerable-app/blob/506f4a8637f63b3dde6cb2535a534641d68b997c/RLHVRnj547_VJp7a0P98lee_KAYggevTqW1ftPnf7n2Azkx6zkAxtMDtpy52aH1FIFG1X08lVYW2YJxq8MehfPNA5xAFxy3ihS_EoNc8l3VpcvdVp6ycjutbsXPPojwo8ymGCcvH2zvIXKs5HCQii2b2Y76XXPr2MySZOJ6sXKROImlCjP2MCHvRfQ6B4qnLZXguWGGdI_DM9.png))
+![Architecture Diagram](https://github.com/Taegi97/vulnerable-app/blob/506f4a8637f63b3dde6cb2535a534641d68b997c/RLHVRnj547_VJp7a0P98lee_KAYggevTqW1ftPnf7n2Azkx6zkAxtMDtpy52aH1FIFG1X08lVYW2YJxq8MehfPNA5xAFxy3ihS_EoNc8l3VpcvdVp6ycjutbsXPPojwo8ymGCcvH2zvIXKs5HCQii2b2Y76XXPr2MySZOJ6sXKROImlCjP2MCHvRfQ6B4qnLZXguWGGdI_DM9.png?raw=true)
 
 ## 3\. 적용된 핵심 보안 기술 (Key Security Features)
 
