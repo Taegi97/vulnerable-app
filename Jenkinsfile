@@ -1,12 +1,5 @@
 pipeline {
-    // [수정!] 파이프라인 전체가 jdk17 도구를 사용하는 환경에서 실행되도록 설정합니다.
-    agent {
-        any {
-            tools {
-                jdk 'jdk17'
-            }
-        }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
